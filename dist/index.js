@@ -41,6 +41,7 @@ const os = __importStar(__nccwpck_require__(37));
 const path = __importStar(__nccwpck_require__(17));
 const tc = __importStar(__nccwpck_require__(784));
 const csVersion = '2.1.0-M5';
+const scalaCLIVersion = '0.1.2';
 const coursierVersionSpec = csVersion;
 function execOutput(cmd, ...args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -137,11 +138,13 @@ function run() {
             }));
             yield core.group('Install Apps', () => __awaiter(this, void 0, void 0, function* () {
                 const apps = core.getInput('apps').split(' ');
+                apps.push(`scala-cli:${scalaCLIVersion}`);
                 if (apps.length) {
                     const coursierBinDir = path.join(os.homedir(), 'cs', 'bin');
                     core.exportVariable('COURSIER_BIN_DIR', coursierBinDir);
                     core.addPath(coursierBinDir);
                     yield cs('install', '--contrib', ...apps);
+                    core.setOutput('scala-cli-version', scalaCLIVersion);
                 }
             }));
         }
