@@ -1,10 +1,6 @@
-# Coursier setup GitHub Action
+# Scala CLI setup GitHub Action
 
-A GitHub Action to install Coursier and use it to install Java and Scala CLI tools.
-
-It can be useful if you want to install a specific version of JVM or use a build tool like `mill` or `seed`.
-
-Inspired by [olafurpg/setup-scala](https://github.com/olafurpg/setup-scala) and the blog post [Single command Scala setup](https://alexarchambault.github.io/posts/2020-09-21-cs-setup.html) by Alex Archambault (author of Coursier).
+A GitHub Action to install Scala CLI.
 
 ## Features
 
@@ -26,7 +22,7 @@ Inspired by [olafurpg/setup-scala](https://github.com/olafurpg/setup-scala) and 
 ```yml
   steps:
     - uses: actions/checkout@v2
-    - uses: coursier/setup-action@v1
+    - uses: VirtusLab/scala-cli-setup@main
       with:
         jvm: adopt:11
         apps: sbtn bloop ammonite
@@ -35,6 +31,7 @@ Inspired by [olafurpg/setup-scala](https://github.com/olafurpg/setup-scala) and 
 ## Outputs
 
 - `cs-version`: version of the installed Coursier (should be the latest available)
+- `scala-cli-version`: version of the installed Scala CLI (should be the latest available)
 
 ## Caching
 
@@ -44,5 +41,5 @@ This action should work well with the official Coursier [cache-action](https://g
   steps:
     - uses: actions/checkout@v2
     - uses: coursier/cache-action@v6
-    - uses: coursier/setup-action@v1
+    - uses: VirtusLab/scala-cli-setup@main
 ```

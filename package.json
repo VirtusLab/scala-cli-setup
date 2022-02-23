@@ -1,8 +1,8 @@
 {
-  "name": "coursier-setup-action",
+  "name": "scala-cli-setup-action",
   "version": "1.0.0",
   "private": true,
-  "description": "Use Coursier to install JVM and Scala apps",
+  "description": "Use Scala CLI to run your Scala code",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/laughedelic/coursier-setup.git"
+    "url": "git+https://github.com/VirtusLab/scala-cli-setup"
   },
   "keywords": [
     "actions",

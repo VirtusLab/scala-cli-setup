@@ -5,6 +5,7 @@ import * as path from 'path'
 import * as tc from '@actions/tool-cache'
 
 const csVersion = '2.1.0-M5'
+const scalaCLIVersion = '0.1.2'
 const coursierVersionSpec = csVersion
 
 async function execOutput(cmd: string, ...args: string[]): Promise<string> {
@@ -97,11 +98,13 @@ async function run(): Promise<void> {
 
     await core.group('Install Apps', async () => {
       const apps: string[] = core.getInput('apps').split(' ')
+      apps.push(`scala-cli:${scalaCLIVersion}`)
       if (apps.length) {
         const coursierBinDir = path.join(os.homedir(), 'cs', 'bin')
         core.exportVariable('COURSIER_BIN_DIR', coursierBinDir)
         core.addPath(coursierBinDir)
         await cs('install', '--contrib', ...apps)
+        core.setOutput('scala-cli-version', scalaCLIVersion)
       }
     })
   } catch (error: any) {

@@ -1,5 +1,5 @@
-name: 'coursier-setup-action'
-description: 'Use Coursier to install JVM and Scala apps'
+name: 'scala-cli-setup-action'
+description: 'Use Scala CLI to run your Scala code'
 author: 'Alexey Alekhin'
 branding:
   icon: 'anchor'
@@ -8,7 +8,7 @@ inputs:
   jvm:
     description: 'JVM to install (leave empty to use default)'
     required: false
-    default: ''
+    default: 'temurin:17'
   apps:
     description: 'Applications to install'
     required: false
@@ -16,6 +16,8 @@ inputs:
 outputs:
   cs-version:
     description: 'Version of the installed Coursier'
+  scala-cli-version:
+    description: 'Version of the installed Scala CLI'
 runs:
   using: 'node12'
   main: 'dist/index.js'
