@@ -11,6 +11,8 @@ A GitHub Action to install Scala CLI.
 
 ## Inputs
 
+- `scala-cli-version`: scala-cli version to install
+  - defaults to latest 
 - `jvm` (optional): JVM to install
   - one of the options from `cs java --available`.
   - if left empty either the existing JVM will be used or Coursier will install its default JVM.
