@@ -99,7 +99,17 @@ async function run(): Promise<void> {
     await core.group('Install Apps', async () => {
       const apps: string[] = core.getInput('apps').split(' ')
       const scalaCLIVersionInput = core.getInput('scala-cli-version')
-      apps.push(`scala-cli:${scalaCLIVersionInput ? scalaCLIVersionInput : scalaCLIVersion}`)
+      let version
+      if (scalaCLIVersionInput) {
+        if (scalaCLIVersionInput === 'latest') {
+          version = ''
+        } else {
+          version = scalaCLIVersionInput
+        }
+      } else {
+        version = scalaCLIVersion
+      }
+      apps.push(`scala-cli${version ? `:${version}` : ''}`)
       if (apps.length) {
         const coursierBinDir = path.join(os.homedir(), 'cs', 'bin')
         core.exportVariable('COURSIER_BIN_DIR', coursierBinDir)

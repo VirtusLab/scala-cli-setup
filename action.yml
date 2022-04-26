@@ -5,6 +5,9 @@ branding:
   icon: 'anchor'
   color: 'green'
 inputs:
+  scala-cli-version:
+    description: 'Version of scala-cli to install ("latest" to install the latest version)'
+    required: false
   jvm:
     description: 'JVM to install (leave empty to use default)'
     required: false
