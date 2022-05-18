@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+    - "update-scala-cli-setup-*"
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SCALA_CLI_SETUP_INTERNAL_KEY }}
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          base: update-scala-cli-setup-0.1.4
+          commit-message: Update dist
+          author: GitHub <noreply@github.com>
+          title: Update dist
+      
