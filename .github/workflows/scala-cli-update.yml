@@ -1,0 +1,26 @@
+on:
+  push:
+    branches:
+    - "update-scala-cli-setup"
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SCALA_CLI_SETUP_INTERNAL_KEY }}
+          ref: main
+      - name: Reset main branch
+        run: |
+          git fetch origin update-scala-cli-setup:update-scala-cli-setup
+          git reset --hard update-scala-cli-setup
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          branch: update-scala-cli
+          commit-message: Update ScalaCLI
+          author: GitHub <noreply@github.com>
+          delete-branch: true
+          title: Update ScalaCLI
+
