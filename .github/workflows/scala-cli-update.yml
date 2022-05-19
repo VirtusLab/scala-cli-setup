@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-    - "update-scala-cli-setup"
+    - "pr-trigger-test"
 
 jobs:
   build: 
@@ -10,15 +10,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ssh-key: ${{ secrets.SCALA_CLI_SETUP_INTERNAL_KEY }}
-          ref: main
+          ref: pr-trigger
       - name: Reset main branch
         run: |
-          git fetch origin update-scala-cli-setup:update-scala-cli-setup
-          git reset --hard update-scala-cli-setup
+          git fetch origin pr-trigger-test:pr-trigger-test
+          git reset --hard pr-trigger-test
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          branch: update-scala-cli
+          branch: pr-trigger-test
           commit-message: Update ScalaCLI
           author: GitHub <noreply@github.com>
           delete-branch: true
