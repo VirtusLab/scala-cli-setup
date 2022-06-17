@@ -2,6 +2,7 @@ on:
   push:
     branches:
     - "update-scala-cli-setup"
+    - "main-test" 
 
 jobs:
   build: 
@@ -11,6 +12,10 @@ jobs:
         with:
           ssh-key: ${{ secrets.SCALA_CLI_SETUP_INTERNAL_KEY }}
           ref: main
+      - uses: webfactory/ssh-agent@fc49353b67b2b7c1e0e6a600572d01a69f2672dd
+        with:
+          ssh-private-key: |
+            ${{ secrets.SCALA_CLI_SETUP_INTERNAL_KEY }}
       - name: Reset main branch
         run: |
           git fetch origin update-scala-cli-setup:update-scala-cli-setup
