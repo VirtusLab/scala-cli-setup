@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - main
+    - update-scala-cli
 
 jobs:
   update-dist:
