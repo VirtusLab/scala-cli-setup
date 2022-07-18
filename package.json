@@ -25,12 +25,12 @@
   "author": "Alexey Alekhin",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.9.0",
     "@actions/exec": "^1.1.0",
     "@actions/tool-cache": "^1.7.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.19",
+    "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "@vercel/ncc": "^0.34.0",
