@@ -45,7 +45,7 @@ const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
 const tc = __importStar(__nccwpck_require__(7784));
 const csVersion = '2.1.0-M5';
-const scalaCLIVersion = '0.1.12';
+const scalaCLIVersion = '0.1.13';
 const coursierVersionSpec = csVersion;
 function execOutput(cmd, ...args) {
     return __awaiter(this, void 0, void 0, function* () {
