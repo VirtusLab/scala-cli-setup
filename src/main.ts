@@ -5,7 +5,7 @@ import * as path from 'path'
 import * as tc from '@actions/tool-cache'
 
 const csVersion = '2.1.0-M5'
-const scalaCLIVersion = '0.1.12'
+const scalaCLIVersion = '0.1.13'
 const coursierVersionSpec = csVersion
 
 async function execOutput(cmd: string, ...args: string[]): Promise<string> {
