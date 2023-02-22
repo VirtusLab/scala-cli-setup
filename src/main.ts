@@ -124,6 +124,13 @@ async function run(): Promise<void> {
         )
       }
     })
+    await core.group('Config --power', async () => {
+      const powerInput = core.getInput('power').trim()
+      const isPower = powerInput === 'true'
+      if (isPower) {
+        await execOutput('scala-cli', 'config', 'power', 'true')
+      }
+    })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error)
     core.setFailed(msg)

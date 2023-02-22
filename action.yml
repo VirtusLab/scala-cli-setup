@@ -20,6 +20,10 @@ inputs:
     description: 'Coursier version to install'
     required: false
     default: ''
+  power:
+    description: 'Value for the --power launcher option'
+    required: false
+    default: 'false'
 outputs:
   cs-version:
     description: 'Version of the installed Coursier'
