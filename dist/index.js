@@ -47,7 +47,7 @@ const tc = __importStar(__nccwpck_require__(7784));
 let csVersion = core.getInput('version');
 if (!csVersion)
     csVersion = '2.1.0-M7-39-gb8f3d7532';
-const scalaCLIVersion = '0.1.20';
+const scalaCLIVersion = '0.2.0';
 const coursierVersionSpec = csVersion;
 function execOutput(cmd, ...args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -165,6 +165,13 @@ function run() {
                     core.addPath(coursierBinDir);
                     yield cs('install', '--contrib', ...apps);
                     core.setOutput('scala-cli-version', yield execOutput('scala-cli', 'version', '--cli-version'));
+                }
+            }));
+            yield core.group('Config --power', () => __awaiter(this, void 0, void 0, function* () {
+                const powerInput = core.getInput('power').trim();
+                const isPower = powerInput === 'true';
+                if (isPower) {
+                    yield execOutput('scala-cli', 'config', 'power', 'true');
                 }
             }));
         }
