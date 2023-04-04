@@ -47,7 +47,7 @@ const tc = __importStar(__nccwpck_require__(7784));
 let csVersion = core.getInput('version');
 if (!csVersion)
     csVersion = '2.1.0-M7-39-gb8f3d7532';
-const scalaCLIVersion = '0.2.1';
+const scalaCLIVersion = '1.0.0-RC1';
 const coursierVersionSpec = csVersion;
 function execOutput(cmd, ...args) {
     return __awaiter(this, void 0, void 0, function* () {
