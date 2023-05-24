@@ -6,7 +6,7 @@ import * as tc from '@actions/tool-cache'
 
 let csVersion = core.getInput('version')
 if (!csVersion) csVersion = '2.1.3'
-const scalaCLIVersion = '1.0.0-RC2'
+const scalaCLIVersion = '1.0.0'
 
 const coursierVersionSpec = csVersion
 
