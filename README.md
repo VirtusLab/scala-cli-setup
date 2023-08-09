@@ -18,6 +18,12 @@ A GitHub Action to install Scala CLI.
   - if left empty either the existing JVM will be used or Coursier will install its default JVM.
 - `apps` (optional): Scala apps to install (`sbtn` by default)
   - space separated list of app names (from the [main channel](https://github.com/coursier/apps))
+- `version` (optional): Coursier version to install
+    - This is defaulted to the latest stable release of Coursier
+- `power` (optional): Value for the `--power` launcher option
+    - Necessary for using feature of scala-cli that require the `--power`
+        option, like publishing.
+    - Defaults to `false`
 
 ### Example with custom inputs
 
