@@ -22,6 +22,7 @@ jobs:
     - name: Build
       shell: bash -l {0}
       run: |
+        nvm install lts/gallium
         nvm use lts/gallium
         npm install
         npm run all
