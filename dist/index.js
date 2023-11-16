@@ -44,11 +44,29 @@ const core = __importStar(__nccwpck_require__(2186));
 const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
 const tc = __importStar(__nccwpck_require__(7784));
-let csVersion = core.getInput('version');
-if (!csVersion)
-    csVersion = '2.1.4';
 const scalaCLIVersion = '1.0.6';
+const architecture_x86_64 = 'x86_64';
+const architecture_aarch64 = 'aarch64';
+const architecture = getArchitecture();
+const csDefaultVersion_x86_64 = '2.1.7';
+const csDefaultVersion_aarch64 = '2.1.7';
+const csVersion = core.getInput('version') ||
+    (architecture === architecture_x86_64 ? csDefaultVersion_x86_64 : csDefaultVersion_aarch64);
 const coursierVersionSpec = csVersion;
+const coursierBinariesGithubRepository = architecture === architecture_x86_64
+    ? 'https://github.com/coursier/coursier/'
+    : 'https://github.com/VirtusLab/coursier-m1/';
+function getArchitecture() {
+    if (process.arch === 'x64') {
+        return architecture_x86_64;
+    }
+    else if (process.arch === 'arm' || process.arch === 'arm64') {
+        return architecture_aarch64;
+    }
+    else {
+        throw new Error(`Coursier does not have support for the ${process.arch} architecture`);
+    }
+}
 function execOutput(cmd, ...args) {
     return __awaiter(this, void 0, void 0, function* () {
         let output = '';
@@ -65,7 +83,7 @@ function execOutput(cmd, ...args) {
 }
 function downloadCoursier() {
     return __awaiter(this, void 0, void 0, function* () {
-        const baseUrl = `https://github.com/coursier/coursier/releases/download/v${csVersion}/cs-x86_64`;
+        const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${architecture}`;
         let csBinary = '';
         switch (process.platform) {
             case 'linux': {
