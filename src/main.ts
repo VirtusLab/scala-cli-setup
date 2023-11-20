@@ -139,9 +139,17 @@ async function run(): Promise<void> {
       }
       apps.push(`scala-cli${version ? `:${version}` : ''}`)
       if (value && apps.length) {
-        const coursierBinDir = path.join(os.homedir(), 'cs', 'bin')
-        core.exportVariable('COURSIER_BIN_DIR', coursierBinDir)
-        core.addPath(coursierBinDir)
+        if (process.env.COURSIER_BIN_DIR) {
+          core.info(
+            `Using the cs bin directory from COURSIER_BIN_DIR: ${process.env.COURSIER_BIN_DIR}`,
+          )
+          core.addPath(process.env.COURSIER_BIN_DIR)
+        } else {
+          const coursierBinDir = path.join(os.homedir(), 'cs', 'bin')
+          core.info(`Setting COURSIER_BIN_DIR to: ${coursierBinDir}`)
+          core.exportVariable('COURSIER_BIN_DIR', coursierBinDir)
+          core.addPath(coursierBinDir)
+        }
         await cs('install', '--contrib', ...apps)
         core.setOutput(
           'scala-cli-version',

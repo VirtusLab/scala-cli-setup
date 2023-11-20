@@ -31,6 +31,8 @@ jobs:
     - run: echo 'name := "foo"' > build.sbt
     - id: scala-cli-setup
       uses: ./
+      env:
+        COURSIER_BIN_DIR: ${{ github.workspace }}/cs/bin
       with:
         jvm: ${{ matrix.jvm }}
         apps: sbt sbtn ammonite bloop:1.4.11

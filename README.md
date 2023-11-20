@@ -25,6 +25,18 @@ A GitHub Action to install Scala CLI.
         option, like publishing.
     - Defaults to `false`
 
+### Environment variables
+- `JAVA_HOME`: path to the JVM to use
+- `COURSIER_BIN_DIR`: (optional) path to the directory where Coursier will install app binaries
+   - defaults to `$HOME/cs/bin`
+   - shouldn't have to be tampered with for vanilla GitHub action runners
+   - make sure the directory is reachable for self-hosted runners
+   - in case of issues, you can set it to something like 
+     ```yaml
+     env:
+       COURSIER_BIN_DIR: ${{ github.workspace }}/cs/bin
+     ```
+
 ### Example with custom inputs
 
 ```yml
