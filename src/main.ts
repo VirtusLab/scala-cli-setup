@@ -4,7 +4,7 @@ import * as os from 'os'
 import * as path from 'path'
 import * as tc from '@actions/tool-cache'
 
-const scalaCLIVersion = '1.0.6'
+const scalaCLIVersion = '1.1.0'
 
 const architecture_x86_64 = 'x86_64'
 const architecture_aarch64 = 'aarch64'
