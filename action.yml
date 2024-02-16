@@ -30,5 +30,5 @@ outputs:
   scala-cli-version:
     description: 'Version of the installed Scala CLI'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

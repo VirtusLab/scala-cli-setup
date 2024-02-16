@@ -19,12 +19,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+        cache: 'npm'
     - name: Build
       shell: bash -l {0}
       run: |
-        nvm install lts/gallium
-        nvm use lts/gallium
-        npm install
+        npm ci
         npm run all
 
     # create an sbt file to enabling sbt caching
