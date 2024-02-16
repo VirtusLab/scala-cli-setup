@@ -29,15 +29,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const cli = __importStar(__nccwpck_require__(1514));
 const core = __importStar(__nccwpck_require__(2186));
@@ -67,146 +58,138 @@ function getArchitecture() {
         throw new Error(`Coursier does not have support for the ${process.arch} architecture`);
     }
 }
-function execOutput(cmd, ...args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let output = '';
-        const options = {
-            listeners: {
-                stdout: (data) => {
-                    output += data.toString();
-                },
+async function execOutput(cmd, ...args) {
+    let output = '';
+    const options = {
+        listeners: {
+            stdout: (data) => {
+                output += data.toString();
             },
-        };
-        yield cli.exec(cmd, args.filter(Boolean), options);
-        return output.trim();
-    });
+        },
+    };
+    await cli.exec(cmd, args.filter(Boolean), options);
+    return output.trim();
 }
-function downloadCoursier() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${architecture}`;
-        let csBinary = '';
-        switch (process.platform) {
-            case 'linux': {
-                const guid = yield tc.downloadTool(`${baseUrl}-pc-linux.gz`);
-                const arc = `${guid}.gz`;
-                yield cli.exec('mv', [guid, arc]);
-                csBinary = arc;
-                break;
-            }
-            case 'darwin': {
-                const guid = yield tc.downloadTool(`${baseUrl}-apple-darwin.gz`);
-                const arc = `${guid}.gz`;
-                yield cli.exec('mv', [guid, arc]);
-                csBinary = arc;
-                break;
-            }
-            case 'win32': {
-                const guid = yield tc.downloadTool(`${baseUrl}-pc-win32.zip`);
-                const arc = `${guid}.zip`;
-                yield cli.exec('mv', [guid, arc]);
-                csBinary = arc;
-                break;
-            }
-            default:
-                core.setFailed(`Unknown process.platform: ${process.platform}`);
+async function downloadCoursier() {
+    const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${architecture}`;
+    let csBinary = '';
+    switch (process.platform) {
+        case 'linux': {
+            const guid = await tc.downloadTool(`${baseUrl}-pc-linux.gz`);
+            const arc = `${guid}.gz`;
+            await cli.exec('mv', [guid, arc]);
+            csBinary = arc;
+            break;
         }
-        if (!csBinary)
-            core.setFailed(`Couldn't download Coursier`);
-        if (csBinary.endsWith('.gz')) {
-            yield cli.exec('gzip', ['-d', csBinary]);
-            csBinary = csBinary.slice(0, csBinary.length - '.gz'.length);
+        case 'darwin': {
+            const guid = await tc.downloadTool(`${baseUrl}-apple-darwin.gz`);
+            const arc = `${guid}.gz`;
+            await cli.exec('mv', [guid, arc]);
+            csBinary = arc;
+            break;
         }
-        if (csBinary.endsWith('.zip')) {
-            const destDir = csBinary.slice(0, csBinary.length - '.zip'.length);
-            yield cli.exec('unzip', ['-j', csBinary, 'cs-x86_64-pc-win32.exe', '-d', destDir]);
-            csBinary = `${destDir}\\cs-x86_64-pc-win32.exe`;
+        case 'win32': {
+            const guid = await tc.downloadTool(`${baseUrl}-pc-win32.zip`);
+            const arc = `${guid}.zip`;
+            await cli.exec('mv', [guid, arc]);
+            csBinary = arc;
+            break;
         }
-        yield cli.exec('chmod', ['+x', csBinary]);
-        return csBinary;
-    });
+        default:
+            core.setFailed(`Unknown process.platform: ${process.platform}`);
+    }
+    if (!csBinary)
+        core.setFailed(`Couldn't download Coursier`);
+    if (csBinary.endsWith('.gz')) {
+        await cli.exec('gzip', ['-d', csBinary]);
+        csBinary = csBinary.slice(0, csBinary.length - '.gz'.length);
+    }
+    if (csBinary.endsWith('.zip')) {
+        const destDir = csBinary.slice(0, csBinary.length - '.zip'.length);
+        await cli.exec('unzip', ['-j', csBinary, 'cs-x86_64-pc-win32.exe', '-d', destDir]);
+        csBinary = `${destDir}\\cs-x86_64-pc-win32.exe`;
+    }
+    await cli.exec('chmod', ['+x', csBinary]);
+    return csBinary;
 }
-function cs(...args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const previous = tc.find('cs', coursierVersionSpec);
-        if (previous) {
-            core.addPath(previous);
-        }
-        else {
-            const csBinary = yield downloadCoursier();
-            const binaryName = process.platform === 'win32' ? 'cs.exe' : 'cs';
-            const csCached = yield tc.cacheFile(csBinary, binaryName, 'cs', csVersion);
-            core.addPath(csCached);
-        }
-        return execOutput('cs', ...args);
-    });
+async function cs(...args) {
+    const previous = tc.find('cs', coursierVersionSpec);
+    if (previous) {
+        core.addPath(previous);
+    }
+    else {
+        const csBinary = await downloadCoursier();
+        const binaryName = process.platform === 'win32' ? 'cs.exe' : 'cs';
+        const csCached = await tc.cacheFile(csBinary, binaryName, 'cs', csVersion);
+        core.addPath(csCached);
+    }
+    return execOutput('cs', ...args);
 }
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield core.group('Install Coursier', () => __awaiter(this, void 0, void 0, function* () {
-                yield cs('--help');
-                core.setOutput('cs-version', csVersion);
-            }));
-            yield core.group('Install JVM', () => __awaiter(this, void 0, void 0, function* () {
-                const jvmInput = core.getInput('jvm');
-                const jvmArg = jvmInput ? ['--jvm', jvmInput] : [];
-                if (!jvmInput && process.env.JAVA_HOME) {
-                    core.info(`skipping, JVM is already installed in ${process.env.JAVA_HOME}`);
+async function run() {
+    try {
+        await core.group('Install Coursier', async () => {
+            await cs('--help');
+            core.setOutput('cs-version', csVersion);
+        });
+        await core.group('Install JVM', async () => {
+            const jvmInput = core.getInput('jvm');
+            const jvmArg = jvmInput ? ['--jvm', jvmInput] : [];
+            if (!jvmInput && process.env.JAVA_HOME) {
+                core.info(`skipping, JVM is already installed in ${process.env.JAVA_HOME}`);
+            }
+            else {
+                await cs('java', ...jvmArg, '-version');
+                const csJavaHome = await cs('java-home', ...jvmArg);
+                core.exportVariable('JAVA_HOME', csJavaHome);
+                core.addPath(path.join(csJavaHome, 'bin'));
+            }
+        });
+        await core.group('Install Apps', async () => {
+            const value = core.getInput('apps').trim();
+            const apps = value.split(' ');
+            const scalaCLIVersionInput = core.getInput('scala-cli-version');
+            let version;
+            if (scalaCLIVersionInput) {
+                if (scalaCLIVersionInput === 'latest') {
+                    version = '';
                 }
                 else {
-                    yield cs('java', ...jvmArg, '-version');
-                    const csJavaHome = yield cs('java-home', ...jvmArg);
-                    core.exportVariable('JAVA_HOME', csJavaHome);
-                    core.addPath(path.join(csJavaHome, 'bin'));
+                    version = scalaCLIVersionInput;
                 }
-            }));
-            yield core.group('Install Apps', () => __awaiter(this, void 0, void 0, function* () {
-                const value = core.getInput('apps').trim();
-                const apps = value.split(' ');
-                const scalaCLIVersionInput = core.getInput('scala-cli-version');
-                let version;
-                if (scalaCLIVersionInput) {
-                    if (scalaCLIVersionInput === 'latest') {
-                        version = '';
-                    }
-                    else {
-                        version = scalaCLIVersionInput;
-                    }
+            }
+            else {
+                version = scalaCLIVersion;
+            }
+            apps.push(`scala-cli${version ? `:${version}` : ''}`);
+            if (value && apps.length) {
+                if (process.env.COURSIER_BIN_DIR) {
+                    core.info(`Using the cs bin directory from COURSIER_BIN_DIR: ${process.env.COURSIER_BIN_DIR}`);
+                    core.addPath(process.env.COURSIER_BIN_DIR);
                 }
                 else {
-                    version = scalaCLIVersion;
+                    const coursierBinDir = path.join(os.homedir(), 'cs', 'bin');
+                    core.info(`Setting COURSIER_BIN_DIR to: ${coursierBinDir}`);
+                    core.exportVariable('COURSIER_BIN_DIR', coursierBinDir);
+                    core.addPath(coursierBinDir);
                 }
-                apps.push(`scala-cli${version ? `:${version}` : ''}`);
-                if (value && apps.length) {
-                    if (process.env.COURSIER_BIN_DIR) {
-                        core.info(`Using the cs bin directory from COURSIER_BIN_DIR: ${process.env.COURSIER_BIN_DIR}`);
-                        core.addPath(process.env.COURSIER_BIN_DIR);
-                    }
-                    else {
-                        const coursierBinDir = path.join(os.homedir(), 'cs', 'bin');
-                        core.info(`Setting COURSIER_BIN_DIR to: ${coursierBinDir}`);
-                        core.exportVariable('COURSIER_BIN_DIR', coursierBinDir);
-                        core.addPath(coursierBinDir);
-                    }
-                    yield cs('install', '--contrib', ...apps);
-                    core.setOutput('scala-cli-version', yield execOutput('scala-cli', 'version', '--cli-version'));
-                }
-            }));
-            yield core.group('Config --power', () => __awaiter(this, void 0, void 0, function* () {
-                const powerInput = core.getInput('power').trim();
-                const isPower = powerInput === 'true';
-                if (isPower) {
-                    yield execOutput('scala-cli', 'config', 'power', 'true');
-                }
-            }));
-        }
-        catch (error) {
-            const msg = error instanceof Error ? error.message : String(error);
-            core.setFailed(msg);
-        }
-    });
+                await cs('install', '--contrib', ...apps);
+                core.setOutput('scala-cli-version', await execOutput('scala-cli', 'version', '--cli-version'));
+            }
+        });
+        await core.group('Config --power', async () => {
+            const powerInput = core.getInput('power').trim();
+            const isPower = powerInput === 'true';
+            if (isPower) {
+                await execOutput('scala-cli', 'config', 'power', 'true');
+            }
+        });
+    }
+    catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        core.setFailed(msg);
+    }
 }
-run();
+void run();
 
 
 /***/ }),
