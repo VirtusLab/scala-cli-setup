@@ -39,8 +39,8 @@ const scalaCLIVersion = '1.5.1';
 const architecture_x86_64 = 'x86_64';
 const architecture_aarch64 = 'aarch64';
 const architecture = getArchitecture();
-const csDefaultVersion_x86_64 = '2.1.13';
-const csDefaultVersion_aarch64 = '2.1.13';
+const csDefaultVersion_x86_64 = '2.1.14';
+const csDefaultVersion_aarch64 = '2.1.14';
 const csVersion = core.getInput('version') ||
     (architecture === architecture_x86_64 ? csDefaultVersion_x86_64 : csDefaultVersion_aarch64);
 const coursierVersionSpec = csVersion;
