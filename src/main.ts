@@ -11,8 +11,8 @@ const architecture_aarch64 = 'aarch64'
 
 const architecture = getArchitecture()
 
-const csDefaultVersion_x86_64 = '2.1.14'
-const csDefaultVersion_aarch64 = '2.1.14'
+const csDefaultVersion_x86_64 = '2.1.17'
+const csDefaultVersion_aarch64 = '2.1.17'
 
 const csVersion =
   core.getInput('version') ||
