@@ -30,7 +30,7 @@
     "@actions/tool-cache": "^2.0.2"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.0.0",
+    "@stylistic/eslint-plugin": "^5.1.0",
     "@types/node": "^24.0.4",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.34.0",
