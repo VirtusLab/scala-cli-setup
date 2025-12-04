@@ -49,14 +49,36 @@ const scalaCLIVersion = '1.10.1';
 const architecture_x86_64 = 'x86_64';
 const architecture_aarch64 = 'aarch64';
 const architecture = getArchitecture();
-const csDefaultVersion_x86_64 = '2.1.24';
-const csDefaultVersion_aarch64 = '2.1.24';
-const csVersion = core.getInput('version') ||
-    (architecture === architecture_x86_64 ? csDefaultVersion_x86_64 : csDefaultVersion_aarch64);
+const csDefaultVersion = '2.1.25-M19';
+const csVersion = core.getInput('version') || csDefaultVersion;
 const coursierVersionSpec = csVersion;
-const coursierBinariesGithubRepository = architecture === architecture_x86_64
+function isVersionAtLeast(version, targetVersion) {
+    // Remove any milestone/RC suffix (e.g., "2.1.25-M19" -> "2.1.25")
+    const baseVersion = version.split('-')[0];
+    const baseTargetVersion = targetVersion.split('-')[0];
+    const parts = baseVersion.split('.').map(Number);
+    const targetParts = baseTargetVersion.split('.').map(Number);
+    const major = parts[0] || 0;
+    const minor = parts[1] || 0;
+    const patch = parts[2] || 0;
+    const targetMajor = targetParts[0] || 0;
+    const targetMinor = targetParts[1] || 0;
+    const targetPatch = targetParts[2] || 0;
+    if (major > targetMajor)
+        return true;
+    if (major < targetMajor)
+        return false;
+    if (minor > targetMinor)
+        return true;
+    if (minor < targetMinor)
+        return false;
+    return patch >= targetPatch;
+}
+const coursierBinariesGithubRepository = isVersionAtLeast(csVersion, '2.1.25')
     ? 'https://github.com/coursier/coursier/'
-    : 'https://github.com/VirtusLab/coursier-m1/';
+    : architecture === architecture_x86_64
+        ? 'https://github.com/coursier/coursier/'
+        : 'https://github.com/VirtusLab/coursier-m1/';
 function getArchitecture() {
     if (process.arch === 'x64') {
         return architecture_x86_64;

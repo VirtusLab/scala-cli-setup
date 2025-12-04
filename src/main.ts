@@ -20,14 +20,14 @@ function isVersionAtLeast(version: string, targetVersion: string): boolean {
   // Remove any milestone/RC suffix (e.g., "2.1.25-M19" -> "2.1.25")
   const baseVersion = version.split('-')[0]
   const baseTargetVersion = targetVersion.split('-')[0]
-  
+
   const parts = baseVersion.split('.').map(Number)
   const targetParts = baseTargetVersion.split('.').map(Number)
-  
+
   const major = parts[0] || 0
   const minor = parts[1] || 0
   const patch = parts[2] || 0
-  
+
   const targetMajor = targetParts[0] || 0
   const targetMinor = targetParts[1] || 0
   const targetPatch = targetParts[2] || 0
@@ -39,12 +39,11 @@ function isVersionAtLeast(version: string, targetVersion: string): boolean {
   return patch >= targetPatch
 }
 
-const coursierBinariesGithubRepository =
-  isVersionAtLeast(csVersion, '2.1.25')
+const coursierBinariesGithubRepository = isVersionAtLeast(csVersion, '2.1.25')
+  ? 'https://github.com/coursier/coursier/'
+  : architecture === architecture_x86_64
     ? 'https://github.com/coursier/coursier/'
-    : architecture === architecture_x86_64
-      ? 'https://github.com/coursier/coursier/'
-      : 'https://github.com/VirtusLab/coursier-m1/'
+    : 'https://github.com/VirtusLab/coursier-m1/'
 
 function getArchitecture(): string {
   if (process.arch === 'x64') {
