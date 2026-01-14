@@ -49,7 +49,7 @@ const scalaCLIVersion = '1.11.0';
 const architecture_x86_64 = 'x86_64';
 const architecture_aarch64 = 'aarch64';
 const architecture = getArchitecture();
-const csDefaultVersion = '2.1.25-M21';
+const csDefaultVersion = '2.1.25-M23';
 const csVersion = core.getInput('version') || csDefaultVersion;
 const coursierVersionSpec = csVersion;
 function isVersionAtLeast(version, targetVersion) {
