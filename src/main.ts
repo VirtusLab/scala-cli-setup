@@ -143,6 +143,10 @@ async function run(): Promise<void> {
       }
     })
 
+    await core.group('Download Bloop', async () => {
+      await cs('fetch', 'ch.epfl.scala:bloop-frontend_2.12:2.0.17')
+    })
+
     await core.group('Install Apps', async () => {
       const value = core.getInput('apps').trim()
       const apps: string[] = value.split(' ')
