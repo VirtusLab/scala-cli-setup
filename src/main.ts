@@ -4,7 +4,7 @@ import * as os from 'os'
 import * as path from 'path'
 import * as tc from '@actions/tool-cache'
 
-const scalaCLIVersion = '1.12.1'
+const scalaCLIVersion = '1.12.2'
 
 const architecture_x86_64 = 'x86_64'
 const architecture_aarch64 = 'aarch64'
@@ -141,10 +141,6 @@ async function run(): Promise<void> {
         core.exportVariable('JAVA_HOME', csJavaHome)
         core.addPath(path.join(csJavaHome, 'bin'))
       }
-    })
-
-    await core.group('Download Bloop', async () => {
-      await cs('fetch', 'ch.epfl.scala:bloop-frontend_2.12:2.0.17')
     })
 
     await core.group('Install Apps', async () => {
