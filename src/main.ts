@@ -4,14 +4,14 @@ import * as os from 'os'
 import * as path from 'path'
 import * as tc from '@actions/tool-cache'
 
-const scalaCLIVersion = '1.13.0'
+const scalaCLIVersion = '1.14.0'
 
 const architecture_x86_64 = 'x86_64'
 const architecture_aarch64 = 'aarch64'
 
 const architecture = getArchitecture()
 
-const csDefaultVersion = '2.1.25-M23'
+const csDefaultVersion = '2.1.25-M25'
 const csVersion = core.getInput('version') || csDefaultVersion
 
 const coursierVersionSpec = csVersion
