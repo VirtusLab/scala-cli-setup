@@ -11,7 +11,7 @@ const architecture_aarch64 = 'aarch64'
 
 const architecture = getArchitecture()
 
-const csDefaultVersion = '2.1.25-M23'
+const csDefaultVersion = '2.1.25-M25'
 const csVersion = core.getInput('version') || csDefaultVersion
 
 const coursierVersionSpec = csVersion
