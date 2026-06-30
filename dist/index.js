@@ -37277,7 +37277,7 @@ const scalaCLIVersion = '1.15.0';
 const architecture_x86_64 = 'x86_64';
 const architecture_aarch64 = 'aarch64';
 const architecture = getArchitecture();
-const csDefaultVersion = '2.1.25-M25';
+const csDefaultVersion = '2.1.25-M26';
 const csVersion = getInput('version') || csDefaultVersion;
 const coursierVersionSpec = csVersion;
 function isVersionAtLeast(version, targetVersion) {
