@@ -37273,7 +37273,7 @@ var tool_cache = __nccwpck_require__(3472);
 
 
 
-const scalaCLIVersion = '1.14.0';
+const scalaCLIVersion = '1.15.0';
 const architecture_x86_64 = 'x86_64';
 const architecture_aarch64 = 'aarch64';
 const architecture = getArchitecture();
