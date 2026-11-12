@@ -68,8 +68,12 @@ async function execOutput(cmd: string, ...args: string[]): Promise<string> {
   return output.trim()
 }
 
+// Coursier doesn't publish a native launcher for Windows ARM64 (only a JVM-based app image),
+// so we fall back to the x86_64 one there, which runs via the x64 emulation on Windows 11 ARM.
+const coursierArchitecture = process.platform === 'win32' ? architecture_x86_64 : architecture
+
 async function downloadCoursier(): Promise<string> {
-  const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${architecture}`
+  const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${coursierArchitecture}`
   let csBinary = ''
   switch (process.platform) {
     case 'linux': {
@@ -103,8 +107,9 @@ async function downloadCoursier(): Promise<string> {
   }
   if (csBinary.endsWith('.zip')) {
     const destDir = csBinary.slice(0, csBinary.length - '.zip'.length)
-    await cli.exec('unzip', ['-j', csBinary, 'cs-x86_64-pc-win32.exe', '-d', destDir])
-    csBinary = `${destDir}\\cs-x86_64-pc-win32.exe`
+    const exeName = `cs-${coursierArchitecture}-pc-win32.exe`
+    await cli.exec('unzip', ['-j', csBinary, exeName, '-d', destDir])
+    csBinary = `${destDir}\\${exeName}`
   }
   await cli.exec('chmod', ['+x', csBinary])
   return csBinary
