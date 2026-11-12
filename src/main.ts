@@ -39,12 +39,6 @@ function isVersionAtLeast(version: string, targetVersion: string): boolean {
   return patch >= targetPatch
 }
 
-const coursierBinariesGithubRepository = isVersionAtLeast(csVersion, '2.1.25')
-  ? 'https://github.com/coursier/coursier/'
-  : architecture === architecture_x86_64
-    ? 'https://github.com/coursier/coursier/'
-    : 'https://github.com/VirtusLab/coursier-m1/'
-
 function getArchitecture(): string {
   if (process.arch === 'x64') {
     return architecture_x86_64
@@ -68,9 +62,28 @@ async function execOutput(cmd: string, ...args: string[]): Promise<string> {
   return output.trim()
 }
 
-// Coursier doesn't publish a native launcher for Windows ARM64 (only a JVM-based app image),
-// so we fall back to the x86_64 one there, which runs via the x64 emulation on Windows 11 ARM.
-const coursierArchitecture = process.platform === 'win32' ? architecture_x86_64 : architecture
+// The first Windows 11 build. Earlier Windows builds on ARM64 (Windows 10) can't emulate x64.
+const windows11FirstBuild = 22000
+
+function isWindowsArmWithoutX64Emulation(): boolean {
+  if (process.platform !== 'win32' || architecture !== architecture_aarch64) return false
+  // os.release() returns e.g. '10.0.22631' on Windows
+  const build = Number(os.release().split('.')[2])
+  return !Number.isNaN(build) && build < windows11FirstBuild
+}
+
+// Coursier doesn't publish a native launcher for Windows ARM64, only a JVM-based app image.
+// On Windows 11 ARM, we use the x86_64 native launcher, which runs via x64 emulation.
+// On Windows 10 ARM, which can't emulate x64, we fall back to the ARM64 JVM-based app image.
+const useCoursierJvmAppImage = isWindowsArmWithoutX64Emulation()
+const coursierArchitecture =
+  process.platform === 'win32' && !useCoursierJvmAppImage ? architecture_x86_64 : architecture
+
+const coursierBinariesGithubRepository = isVersionAtLeast(csVersion, '2.1.25')
+  ? 'https://github.com/coursier/coursier/'
+  : coursierArchitecture === architecture_x86_64
+    ? 'https://github.com/coursier/coursier/'
+    : 'https://github.com/VirtusLab/coursier-m1/'
 
 async function downloadCoursier(): Promise<string> {
   const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${coursierArchitecture}`
@@ -115,10 +128,26 @@ async function downloadCoursier(): Promise<string> {
   return csBinary
 }
 
+// The JVM-based app image is a whole directory (cs.exe, app/, runtime/), so it has to be kept together.
+async function downloadCoursierJvmAppImage(): Promise<string> {
+  const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${coursierArchitecture}`
+  const guid = await tc.downloadTool(`${baseUrl}-pc-win32-jvm.zip`)
+  const arc = `${guid}.zip`
+  await cli.exec('mv', [guid, arc])
+  return tc.extractZip(arc)
+}
+
 async function cs(...args: string[]): Promise<string> {
   const previous = tc.find('cs', coursierVersionSpec)
   if (previous) {
     core.addPath(previous)
+  } else if (useCoursierJvmAppImage) {
+    core.info(
+      `Windows ARM64 without x64 emulation detected (${os.release()}), using the JVM-based Coursier launcher`,
+    )
+    const csDir = await downloadCoursierJvmAppImage()
+    const csCached = await tc.cacheDir(csDir, 'cs', csVersion)
+    core.addPath(csCached)
   } else {
     const csBinary = await downloadCoursier()
     const binaryName = process.platform === 'win32' ? 'cs.exe' : 'cs'
