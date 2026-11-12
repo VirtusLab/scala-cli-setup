@@ -15,10 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macOS-15-intel, macOS-latest, windows-latest, windows-11-arm]
-        jvm: ['temurin:17']
-        include:
-        - os: windows-11-arm
-          jvm: 'zulu:17'
+        jvm: ['zulu:17']
     steps:
     - uses: actions/checkout@v7
 
