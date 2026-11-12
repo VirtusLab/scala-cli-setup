@@ -39,6 +39,20 @@ function isVersionAtLeast(version: string, targetVersion: string): boolean {
   return patch >= targetPatch
 }
 
+// Like isVersionAtLeast, but also compares milestones of the same base version
+// (e.g. "2.1.25-M25" < "2.1.25-M26" < "2.1.25"). Unrecognised suffixes don't satisfy it.
+function isVersionWithMilestoneAtLeast(version: string, targetVersion: string): boolean {
+  if (!isVersionAtLeast(version, targetVersion)) return false
+  if (!isVersionAtLeast(targetVersion, version)) return true // strictly newer base version
+  const milestone = (v: string): number => {
+    const suffix = v.split('-').slice(1).join('-')
+    if (!suffix) return Number.POSITIVE_INFINITY // a final release comes after all its milestones
+    const match = /^M(\d+)$/.exec(suffix)
+    return match ? Number(match[1]) : Number.NaN
+  }
+  return milestone(version) >= milestone(targetVersion)
+}
+
 function getArchitecture(): string {
   if (process.arch === 'x64') {
     return architecture_x86_64
@@ -128,8 +142,17 @@ async function downloadCoursier(): Promise<string> {
   return csBinary
 }
 
+// The first Coursier version publishing the Windows ARM64 JVM-based app image.
+const coursierWindowsArmJvmAppImageMinVersion = '2.1.25-M26'
+
 // The JVM-based app image is a whole directory (cs.exe, app/, runtime/), so it has to be kept together.
 async function downloadCoursierJvmAppImage(): Promise<string> {
+  if (!isVersionWithMilestoneAtLeast(csVersion, coursierWindowsArmJvmAppImageMinVersion)) {
+    throw new Error(
+      `Coursier ${csVersion} doesn't support Windows ARM64 without x64 emulation (${os.release()}). ` +
+        `Use Coursier ${coursierWindowsArmJvmAppImageMinVersion} or newer (the 'version' input), or Windows 11.`,
+    )
+  }
   const baseUrl = `${coursierBinariesGithubRepository}/releases/download/v${csVersion}/cs-${coursierArchitecture}`
   const guid = await tc.downloadTool(`${baseUrl}-pc-win32-jvm.zip`)
   const arc = `${guid}.zip`
