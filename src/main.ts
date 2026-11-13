@@ -180,6 +180,32 @@ async function cs(...args: string[]): Promise<string> {
   return execOutput('cs', ...args)
 }
 
+// On Windows 11 ARM64, cs is the x86_64 launcher running under emulation, so it'd pick x64 JVMs by default,
+// which would then run emulated (and much slower) as well. Ask for arm64 JVMs explicitly instead.
+// (The JVM-based cs used on Windows 10 ARM64 is an arm64 process, so it picks arm64 JVMs by itself.)
+const preferArm64Jvm =
+  process.platform === 'win32' && architecture === architecture_aarch64 && !useCoursierJvmAppImage
+
+async function installJvm(jvmArg: string[]): Promise<string> {
+  if (preferArm64Jvm) {
+    const arm64Arg = ['--architecture', 'arm64']
+    try {
+      await cs('java', ...jvmArg, ...arm64Arg, '-version')
+      return await cs('java-home', ...jvmArg, ...arm64Arg)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error)
+      const jvmName = jvmArg[1] ?? 'the default JVM'
+      core.warning(
+        `Couldn't install an arm64 build of ${jvmName} (${msg}), falling back to x64, which runs via emulation ` +
+          `and is considerably slower. Pick a JVM with Windows arm64 builds to avoid it ` +
+          `(e.g. zulu:17, microsoft-openjdk:17, temurin:21).`,
+      )
+    }
+  }
+  await cs('java', ...jvmArg, '-version')
+  return cs('java-home', ...jvmArg)
+}
+
 async function run(): Promise<void> {
   try {
     await core.group('Install Coursier', async () => {
@@ -193,8 +219,7 @@ async function run(): Promise<void> {
       if (!jvmInput && process.env.JAVA_HOME) {
         core.info(`skipping, JVM is already installed in ${process.env.JAVA_HOME}`)
       } else {
-        await cs('java', ...jvmArg, '-version')
-        const csJavaHome = await cs('java-home', ...jvmArg)
+        const csJavaHome = await installJvm(jvmArg)
         core.exportVariable('JAVA_HOME', csJavaHome)
         core.addPath(path.join(csJavaHome, 'bin'))
       }
