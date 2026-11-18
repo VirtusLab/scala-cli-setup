@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macOS-15-intel, macOS-latest, windows-latest, windows-11-arm]
-        jvm: ['temurin:17']
+        jvm: ['zulu:25']
     steps:
     - uses: actions/checkout@v7
 
@@ -45,6 +45,8 @@ jobs:
     # test Java
     - run: echo $JAVA_HOME
     - run: java -version
+    - run: java -XshowSettings:properties -version 2>&1 | grep os.arch
+      shell: bash
     - run: cs java -version
 
     # test installed apps
